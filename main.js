@@ -131,30 +131,35 @@ function setup()
     canvas.addEventListener("touchstart", function(e) {
         updateTouchPos(e);
 
-        digTargetX = Math.floor((mouse.x - 184) / 48);
-        digTargetY = Math.floor((mouse.y - 53) / 48);
+        const tapX = Math.floor((mouse.x - 184) / 48);
+        const tapY = Math.floor((mouse.y - 53) / 48);
 
         if (state === 0) {
             playSound(sndJingle);
             state = 1;
             gameInit();
-        } else if (state === 1) {
-            if (digTargetX == 10 && digTargetY == 0) {
+            return;
+        }
+
+        if (state === 1) {
+            digTargetX = tapX;
+            digTargetY = tapY;
+            if (tapX == 10 && tapY == 0) {
                 tool = 1;
                 toolAnimation = 15;
                 return;
             }
-            if (digTargetX == 10 && digTargetY == 2) {
+            if (tapX == 10 && tapY == 2) {
                 tool = 2;
                 toolAnimation = 15;
                 return;
             }
-            if (digTargetX == 10 && digTargetY == 4) {
+            if (tapX == 10 && tapY == 4) {
                 tool = 3;
                 toolAnimation = 15;
                 return;
             }
-            if (digTargetX == 10 && digTargetY == 6) {
+            if (tapX == 10 && tapY == 6) {
                 e.preventDefault();
                 doDigAction();
             }
@@ -179,9 +184,6 @@ function update()
     if (state == 0) {
 
     } else if (state == 1) {
-        // カーソルの位置更新
-        posX = Math.floor((mouse.x - 184) / 48);
-        posY = Math.floor((mouse.y - 53) / 48);
         // パーティクルの動き
         for (let i = particles.length - 1; i >= 0; i--) {
             const p = particles[i];
@@ -272,18 +274,18 @@ function draw()
         ctx.drawImage(imgDig, 0, 0, 16, 16, 660, 338, 48, 48);
         
         // 採掘範囲の線
-        if (posX >= 0 && posX <= 8 && posY >= 0 && posY <= 8) {
+        if (digTargetX >= 0 && digTargetX <= 8 && digTargetY >= 0 && digTargetY <= 8) {
             ctx.strokeStyle = "#fb3";
 
             switch (tool) {
                 case 1:
-                    ctx.strokeRect((posX - 1) * 48 + 180, (posY - 1) * 48 + 50, 144, 144);
+                    ctx.strokeRect((digTargetX - 1) * 48 + 180, (digTargetY - 1) * 48 + 50, 144, 144);
                     break;
                 case 2:
-                    ctx.strokeRect(posX * 48 + 180, (posY - 1) * 48 + 50, 48, 144);
+                    ctx.strokeRect(digTargetX * 48 + 180, (digTargetY - 1) * 48 + 50, 48, 144);
                     break;
                 case 3:
-                    ctx.strokeRect(posX * 48 + 180, posY * 48 + 50, 48, 48);
+                    ctx.strokeRect(digTargetX * 48 + 180, digTargetY * 48 + 50, 48, 48);
                     break;
             }
         }
@@ -296,13 +298,13 @@ function draw()
 
             switch (tool) {
                 case 1:
-                    ctx.strokeRect((posX - 1) * 48 + 180, (posY - 1) * 48 + 50, 144, 144);
+                    ctx.strokeRect((digTargetX - 1) * 48 + 180, (digTargetY - 1) * 48 + 50, 144, 144);
                     break;
                 case 2:
-                    ctx.strokeRect(posX * 48 + 180, (posY - 1) * 48 + 50, 48, 144);
+                    ctx.strokeRect(digTargetX * 48 + 180, (digTargetY - 1) * 48 + 50, 48, 144);
                     break;
                 case 3:
-                    ctx.strokeRect(posX * 48 + 180, posY * 48 + 50, 48, 48);
+                    ctx.strokeRect(digTargetX * 48 + 180, digTargetY * 48 + 50, 48, 48);
                     break;
             }
         }
@@ -400,8 +402,8 @@ function draw()
     ctx.font = "12px sans-serif";
     ctx.textAlign = "left";
     if (debug) {
-        ctx.fillText("PosX = " + Math.floor(posX), 0, 10);
-        ctx.fillText("PosY = " + Math.floor(posY), 0, 30);
+        ctx.fillText("tapX = " + Math.floor(tapX), 0, 10);
+        ctx.fillText("tapY = " + Math.floor(tapY), 0, 30);
         ctx.fillText("item =  " + item, 0, 50);
         ctx.fillText("state = " + state, 0, 70);
     }
