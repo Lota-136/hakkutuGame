@@ -29,16 +29,14 @@ const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 560;
 
 let mouse = {};
-document.onmousemove = function (e) {
-    mouse.x = e.clientX / scaleRate;
-    mouse.y = e.clientY / scaleRate;
-}
 
 let state = 0;
 let debug = true;
 
 let posX;
 let posY;
+let digTargetX = null;
+let digTargetY = null;
 let tool;
 let hp;
 let item;
@@ -130,63 +128,39 @@ function setup()
     sndMiss.src = "sound/miss.mp3";
     sndJingle.src = "sound/jingle.mp3";
 
-    canvas.addEventListener("click", () => {
+    canvas.addEventListener("touchstart", function(e) {
+        updateTouchPos(e);
+
+        digTargetX = Math.floor((mouse.x - 184) / 48);
+        digTargetY = Math.floor((mouse.y - 53) / 48);
+
         if (state === 0) {
             playSound(sndJingle);
             state = 1;
             gameInit();
         } else if (state === 1) {
-            if (posX == 10 && posY == 0) {
+            if (digTargetX == 10 && digTargetY == 0) {
                 tool = 1;
                 toolAnimation = 15;
                 return;
             }
-            if (posX == 10 && posY == 2) {
+            if (digTargetX == 10 && digTargetY == 2) {
                 tool = 2;
                 toolAnimation = 15;
                 return;
             }
-            if (posX == 10 && posY == 4) {
+            if (digTargetX == 10 && digTargetY == 4) {
                 tool = 3;
                 toolAnimation = 15;
                 return;
             }
-            
-        } else if (state == 2 || state == 3) {
-            // もう一度遊ぶ
-            if (mouse.x >= 150 && mouse.x <= 350 && mouse.y >= 350 && mouse.y <= 420) {
-                playSound(sndJingle);
-                state = 1;
-                gameInit();
-            }
-            // タイトルに戻る
-            if (mouse.x >= 450 && mouse.x <= 650 && mouse.y >= 350 && mouse.y <= 420) {
-                state = 0;
+            if (digTargetX == 10 && digTargetY == 6) {
+                e.preventDefault();
+                doDigAction();
             }
         }
-    });
+    }, { passive: false });
 
-    if (debug) {
-        document.addEventListener("keyup", function (event) {
-            let key = event.key;
-            if (key == "q") {
-                field = [
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0, 0, 0]
-                ];
-            }
-        })
-    }
-
-
-    // タッチ操作
     canvas.addEventListener("touchstart", updateTouchPos, { passive: false });
     canvas.addEventListener("touchmove", updateTouchPos, { passive: false });
 
@@ -533,30 +507,32 @@ function playSound(snd) {
 }
 
 function doDigAction() {
-    if (posX >= 0 && posX <= 8 && posY >= 0 && posY <= 8) {
+    const x = digTargetX;
+    const y = digTargetY;
+    if (x >= 0 && x <= 8 && y >= 0 && y <= 8) {
         switch (tool) {
             case 1:
-                if (posX != 8) {
-                    if (posY != 8) excavate(field, posX + 1, posY + 1);
-                    if (posY != 0) excavate(field, posX + 1, posY - 1);
-                    excavate(field, posX + 1, posY);
+                if (x != 8) {
+                    if (y != 8) excavate(field, x + 1, y + 1);
+                    if (y != 0) excavate(field, x + 1, y - 1);
+                    excavate(field, x + 1, y);
                 }
-                if (posX != 0) {
-                    if (posY != 8) excavate(field, posX - 1, posY + 1);
-                    if (posY != 0) excavate(field, posX - 1, posY - 1);
-                    excavate(field, posX - 1, posY);
+                if (x != 0) {
+                    if (y != 8) excavate(field, x - 1, y + 1);
+                    if (y != 0) excavate(field, x - 1, y - 1);
+                    excavate(field, x - 1, y);
                 }
-                if (posY != 8) excavate(field, posX, posY + 1);
-                if (posY != 0) excavate(field, posX, posY - 1);
-                excavate(field, posX, posY);
+                if (y != 8) excavate(field, x, y + 1);
+                if (y != 0) excavate(field, x, y - 1);
+                excavate(field, x, y);
                 break;
             case 2:
-                if (posY != 8) excavate(field, posX, posY + 1);
-                if (posY != 0) excavate(field, posX, posY - 1);
-                excavate(field, posX, posY);
+                if (y != 8) excavate(field, x, y + 1);
+                if (y != 0) excavate(field, x, y - 1);
+                excavate(field, x, y);
                 break;
             case 3:
-                excavate(field, posX, posY);
+                excavate(field, x, y);
                 break;
         }
     }
