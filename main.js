@@ -142,8 +142,11 @@ function setup()
         }
 
         if (state === 1) {
-            digTargetX = tapX;
-            digTargetY = tapY;
+            if (tapX >= 0 && tapX <= 8 && tapY >= 0 && tapY <= 8) {
+                digTargetX = tapX;
+                digTargetY = tapY;
+            }
+
             if (tapX == 10 && tapY == 0) {
                 tool = 1;
                 toolAnimation = 15;
@@ -162,6 +165,7 @@ function setup()
             if (tapX == 10 && tapY == 6) {
                 e.preventDefault();
                 doDigAction();
+                return;
             }
         }
     }, { passive: false });
