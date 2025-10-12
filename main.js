@@ -510,7 +510,7 @@ function playSound(snd) {
 function doDigAction() {
     const x = digTargetX;
     const y = digTargetY;
-    if (x >= 0 && x <= 8 && y >= 0 && y <= 8) {
+    // if (x >= 0 && x <= 8 && y >= 0 && y <= 8) {
         switch (tool) {
             case 1:
                 if (x != 8) {
@@ -536,7 +536,7 @@ function doDigAction() {
                 excavate(field, x, y);
                 break;
         }
-    }
+    // }
 
     // ダメージ処理
     if (isDamaged) {
