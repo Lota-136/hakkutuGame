@@ -170,7 +170,20 @@ function setup()
         }
     }, { passive: false });
 
-    canvas.addEventListener("touchmove", updateTouchPos, { passive: false });
+    canvas.addEventListener("touchmove", function (e) {
+        updateTouchPos(e);
+
+        if (state === 1) {
+            const tapX = Math.floor((mouse.x - 184) / 48);
+            const tapY = Math.floor((mouse.y - 53) / 48);
+
+            // 盤面の範囲内なら更新する
+            if (tapX >= 0 && tapX <= 8 && tapY >= 0 && tapY <= 8) {
+                digTargetX = tapX;
+                digTargetY = tapY;
+            }
+        }
+    }, { passive: false });
 
     function updateTouchPos(e) {
         e.preventDefault(); // スクロール防止
