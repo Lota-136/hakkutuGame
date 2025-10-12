@@ -166,7 +166,6 @@ function setup()
         }
     }, { passive: false });
 
-    canvas.addEventListener("touchstart", updateTouchPos, { passive: false });
     canvas.addEventListener("touchmove", updateTouchPos, { passive: false });
 
     function updateTouchPos(e) {
