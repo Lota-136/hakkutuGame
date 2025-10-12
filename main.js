@@ -46,8 +46,8 @@ let isGameClear;
 let isDamaged = false;  // この番ダメージを受けたか
 let isExcavated = false;    // この番土を掘ったか
 let particles = [];
-let toolAnimation;
-let damageAnimation;
+let toolAnimation = 0;
+let damageAnimation = 0;
 
 let field = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -71,6 +71,7 @@ const imgTakebera1 = new Image();
 const imgTakebera2 = new Image();
 const imgHeart1 = new Image();
 const imgHeart2 = new Image();
+const imgDig = new Image();
 const imgTitle = new Image();
 const imgBack = new Image();
 
@@ -115,6 +116,7 @@ function setup()
     imgTakebera2.src = "img/takebera2.png";
     imgHeart1.src = "img/heart1.png";
     imgHeart2.src = "img/heart2.png";
+    imgDig.src = "img/dig.png";
     imgTitle.src = "img/title.png";
     imgBack.src = "img/back.png";
 
@@ -129,74 +131,27 @@ function setup()
     sndJingle.src = "sound/jingle.mp3";
 
     canvas.addEventListener("click", () => {
-        if (state == 0) {
+        if (state === 0) {
             playSound(sndJingle);
             state = 1;
             gameInit();
-        } else if (state == 1) {
+        } else if (state === 1) {
             if (posX == 10 && posY == 0) {
                 tool = 1;
                 toolAnimation = 15;
-            } else if (posX == 10 && posY == 2) {
+                return;
+            }
+            if (posX == 10 && posY == 2) {
                 tool = 2;
                 toolAnimation = 15;
-            } else if (posX == 10 && posY == 4) {
+                return;
+            }
+            if (posX == 10 && posY == 4) {
                 tool = 3;
                 toolAnimation = 15;
-            }
-
-            if (posX >= 0 && posX <= 8 && posY >= 0 && posY <= 8) {
-                switch (tool) {
-                    case 1:
-                        if (posX != 8) {
-                            if (posY != 8) excavate(field, posX + 1, posY + 1);
-                            if (posY != 0) excavate(field, posX + 1, posY - 1);
-                            excavate(field, posX + 1, posY);
-                        }
-                        if (posX != 0) {
-                            if (posY != 8) excavate(field, posX - 1, posY + 1);
-                            if (posY != 0) excavate(field, posX - 1, posY - 1);
-                            excavate(field, posX - 1, posY);
-                        }
-                        if (posY != 8) excavate(field, posX, posY + 1);
-                        if (posY != 0) excavate(field, posX, posY - 1);
-                        excavate(field, posX, posY);
-                        break;
-                    case 2:
-                        if (posY != 8) excavate(field, posX, posY + 1);
-                        if (posY != 0) excavate(field, posX, posY - 1);    
-                        excavate(field, posX, posY);
-                        break;
-                    case 3:
-                        excavate(field, posX, posY);
-                        break;
-                }
+                return;
             }
             
-            // ダメージ処理
-            if (isDamaged) {
-                hp--;
-                playSound(sndMiss);
-                isDamaged = false;
-                damageAnimation = 15;
-            }
-
-            // 音処理
-            if (isExcavated) {
-                playSound(sndExcavate);
-                isExcavated = false;
-            }
-
-            // ゲームオーバー？
-            if (hp <= 0) state = 3;
-            
-            // クリアしたか？
-            isGameClear = true;
-            for (let y = 0; y < field.length; y++) {
-                for (let x = 0; x < field[y].length; x++) {
-                    if (field[x][y] != 0) isGameClear = false;
-                }
-            }
         } else if (state == 2 || state == 3) {
             // もう一度遊ぶ
             if (mouse.x >= 150 && mouse.x <= 350 && mouse.y >= 350 && mouse.y <= 420) {
@@ -210,6 +165,7 @@ function setup()
             }
         }
     });
+
     if (debug) {
         document.addEventListener("keyup", function (event) {
             let key = event.key;
@@ -228,13 +184,26 @@ function setup()
             }
         })
     }
+
+
+    // タッチ操作
+    canvas.addEventListener("touchstart", updateTouchPos, { passive: false });
+    canvas.addEventListener("touchmove", updateTouchPos, { passive: false });
+
+    function updateTouchPos(e) {
+        e.preventDefault(); // スクロール防止
+        const t = e.touches[0];
+        mouse.x = t.clientX / scaleRate;
+        mouse.y = t.clientY / scaleRate;
+    }
+
     update();
 }
 
 function update()
 {
     if (state == 0) {
-        // タイトル
+
     } else if (state == 1) {
         // カーソルの位置更新
         posX = Math.floor((mouse.x - 184) / 48);
@@ -250,6 +219,7 @@ function update()
             if (p.life <= 0) particles.splice(i, 1);
         }
 
+        // animationを規定値に → 0までの間アニメーションする
         if (toolAnimation > 0) toolAnimation--;
         if (damageAnimation > 0) damageAnimation--;
 
@@ -257,8 +227,6 @@ function update()
             playSound(sndJingle);
             state = 2;
         }
-    } else {
-
     }
     draw();
     setTimeout(update, 1000 / 30);
@@ -326,6 +294,8 @@ function draw()
         } else {
             ctx.drawImage(imgTakebera1, 0, 0, 16, 16, 660, 242, 48, 48);
         }
+
+        ctx.drawImage(imgDig, 0, 0, 16, 16, 660, 338, 48, 48);
         
         // 採掘範囲の線
         if (posX >= 0 && posX <= 8 && posY >= 0 && posY <= 8) {
@@ -452,7 +422,7 @@ function draw()
         ctx.fillText("ゲームオーバー", 400, 150);
     }
 
-    // デバッグ
+    // デバッグ表示
     ctx.font = "12px sans-serif";
     ctx.textAlign = "left";
     if (debug) {
@@ -460,7 +430,6 @@ function draw()
         ctx.fillText("PosY = " + Math.floor(posY), 0, 30);
         ctx.fillText("item =  " + item, 0, 50);
         ctx.fillText("state = " + state, 0, 70);
-        ctx.fillText("toolAnimation = " + toolAnimation, 0, 90);
     }
 }
 
@@ -508,7 +477,7 @@ function excavate(field, x, y) {
     }
 }
 
-// 現在不使用
+// 現在不使用　DrawLine関数
 // function drawLine(x1, y1, x2, y2)
 // {
 //     ctx.beginPath();
@@ -561,4 +530,59 @@ function playSound(snd) {
     snd.pause();
     snd.currentTime = 0;
     snd.play();
+}
+
+function doDigAction() {
+    if (posX >= 0 && posX <= 8 && posY >= 0 && posY <= 8) {
+        switch (tool) {
+            case 1:
+                if (posX != 8) {
+                    if (posY != 8) excavate(field, posX + 1, posY + 1);
+                    if (posY != 0) excavate(field, posX + 1, posY - 1);
+                    excavate(field, posX + 1, posY);
+                }
+                if (posX != 0) {
+                    if (posY != 8) excavate(field, posX - 1, posY + 1);
+                    if (posY != 0) excavate(field, posX - 1, posY - 1);
+                    excavate(field, posX - 1, posY);
+                }
+                if (posY != 8) excavate(field, posX, posY + 1);
+                if (posY != 0) excavate(field, posX, posY - 1);
+                excavate(field, posX, posY);
+                break;
+            case 2:
+                if (posY != 8) excavate(field, posX, posY + 1);
+                if (posY != 0) excavate(field, posX, posY - 1);
+                excavate(field, posX, posY);
+                break;
+            case 3:
+                excavate(field, posX, posY);
+                break;
+        }
+    }
+
+    // ダメージ処理
+    if (isDamaged) {
+        hp--;
+        playSound(sndMiss);
+        isDamaged = false;
+        damageAnimation = 15;
+    }
+
+    // 音処理
+    if (isExcavated) {
+        playSound(sndExcavate);
+        isExcavated = false;
+    }
+
+    // ゲームオーバー？
+    if (hp <= 0) state = 3;
+
+    // クリアしたか？
+    isGameClear = true;
+    for (let y = 0; y < field.length; y++) {
+        for (let x = 0; x < field[y].length; x++) {
+            if (field[x][y] != 0) isGameClear = false;
+        }
+    }
 }
