@@ -402,8 +402,8 @@ function draw()
     ctx.font = "12px sans-serif";
     ctx.textAlign = "left";
     if (debug) {
-        ctx.fillText("tapX = " + Math.floor(tapX), 0, 10);
-        ctx.fillText("tapY = " + Math.floor(tapY), 0, 30);
+        ctx.fillText("digTargetX = " + Math.floor(digTargetX), 0, 10);
+        ctx.fillText("digTargetY = " + Math.floor(digTargetY), 0, 30);
         ctx.fillText("item =  " + item, 0, 50);
         ctx.fillText("state = " + state, 0, 70);
     }
