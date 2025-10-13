@@ -147,25 +147,32 @@ function setup()
                 digTargetY = tapY;
             }
 
-            if (tapX == 10 && tapY == 0) {
+            // ボタン類
+            if (tapX == -2 && tapY == 0) {
                 tool = 1;
                 toolAnimation = 15;
                 return;
             }
-            if (tapX == 10 && tapY == 2) {
+            if (tapX == -2 && tapY == 2) {
                 tool = 2;
                 toolAnimation = 15;
                 return;
             }
-            if (tapX == 10 && tapY == 4) {
+            if (tapX == -2 && tapY == 4) {
                 tool = 3;
                 toolAnimation = 15;
                 return;
             }
-            if (tapX == 10 && tapY == 6) {
+            // 掘るボタン
+            if (tapX == -2 && tapY == 6) {
                 e.preventDefault();
                 doDigAction();
                 return;
+            }
+
+            // 全画面表示ボタン
+            if (tapX == 10 && tapY == 0) {
+                changeFullScreen();
             }
         }
     }, { passive: false });
@@ -272,22 +279,22 @@ function draw()
 
         // 道具アイコン
         if (tool == 1) {
-            ctx.drawImage(imgShovel2, 0, 0, 16, 16, 660, 50, 48, 48);
+            ctx.drawImage(imgShovel2, 0, 0, 16, 16, 84, 50, 48, 48);
         } else {
-            ctx.drawImage(imgShovel1, 0, 0, 16, 16, 660, 50, 48, 48);
+            ctx.drawImage(imgShovel1, 0, 0, 16, 16, 84, 50, 48, 48);
         }
         if (tool == 2) {
-            ctx.drawImage(imgSankakuho2, 0, 0, 16, 16, 660, 146, 48, 48);
+            ctx.drawImage(imgSankakuho2, 0, 0, 16, 16, 84, 146, 48, 48);
         } else {
-            ctx.drawImage(imgSankakuho1, 0, 0, 16, 16, 660, 146, 48, 48);
+            ctx.drawImage(imgSankakuho1, 0, 0, 16, 16, 84, 146, 48, 48);
         }
         if (tool == 3) {
-            ctx.drawImage(imgTakebera2, 0, 0, 16, 16, 660, 242, 48, 48);
+            ctx.drawImage(imgTakebera2, 0, 0, 16, 16, 84, 242, 48, 48);
         } else {
-            ctx.drawImage(imgTakebera1, 0, 0, 16, 16, 660, 242, 48, 48);
+            ctx.drawImage(imgTakebera1, 0, 0, 16, 16, 84, 242, 48, 48);
         }
 
-        ctx.drawImage(imgDig, 0, 0, 16, 16, 660, 338, 48, 48);
+        ctx.drawImage(imgDig, 0, 0, 16, 16, 84, 338, 48, 48);
         
         // 採掘範囲の線
         if (digTargetX >= 0 && digTargetX <= 8 && digTargetY >= 0 && digTargetY <= 8) {
@@ -306,24 +313,24 @@ function draw()
             }
         }
 
-        // 採掘範囲のアニメーション表示
-        if (toolAnimation > 0) {
-            const alpha = toolAnimation / 15;
-            ctx.strokeStyle = `rgba(255, 187, 51, ${alpha})`;
-            ctx.lineWidth = 4;
+        // 採掘範囲のアニメーション表示（スマホ操作では非表示）
+        // if (toolAnimation > 0) {
+        //     const alpha = toolAnimation / 15;
+        //     ctx.strokeStyle = `rgba(255, 187, 51, ${alpha})`;
+        //     ctx.lineWidth = 4;
 
-            switch (tool) {
-                case 1:
-                    ctx.strokeRect((digTargetX - 1) * 48 + 180, (digTargetY - 1) * 48 + 50, 144, 144);
-                    break;
-                case 2:
-                    ctx.strokeRect(digTargetX * 48 + 180, (digTargetY - 1) * 48 + 50, 48, 144);
-                    break;
-                case 3:
-                    ctx.strokeRect(digTargetX * 48 + 180, digTargetY * 48 + 50, 48, 48);
-                    break;
-            }
-        }
+        //     switch (tool) {
+        //         case 1:
+        //             ctx.strokeRect((digTargetX - 1) * 48 + 180, (digTargetY - 1) * 48 + 50, 144, 144);
+        //             break;
+        //         case 2:
+        //             ctx.strokeRect(digTargetX * 48 + 180, (digTargetY - 1) * 48 + 50, 48, 144);
+        //             break;
+        //         case 3:
+        //             ctx.strokeRect(digTargetX * 48 + 180, digTargetY * 48 + 50, 48, 48);
+        //             break;
+        //     }
+        // }
 
         // hp
         if (hp >= 5) {
@@ -578,5 +585,16 @@ function doDigAction() {
         for (let x = 0; x < field[y].length; x++) {
             if (field[x][y] != 0) isGameClear = false;
         }
+    }
+}
+
+function changeFullScreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
     }
 }
