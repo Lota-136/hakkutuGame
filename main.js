@@ -69,7 +69,6 @@ const imgTakebera1 = new Image();
 const imgTakebera2 = new Image();
 const imgHeart1 = new Image();
 const imgHeart2 = new Image();
-const imgDig = new Image();
 const imgTitle = new Image();
 const imgBack = new Image();
 
@@ -91,6 +90,7 @@ window.onload = setup;
 
 function setup()
 {
+    // canvasの生成
     canvas = document.createElement(`canvas`);
     canvas.width = SCREEN_WIDTH;
     canvas.height = SCREEN_HEIGHT;
@@ -104,6 +104,12 @@ function setup()
     ctx = canvas.getContext(`2d`);
     document.body.appendChild(canvas);
 
+    // ボタンの生成
+    const imgDig = document.createElement("img");
+    imgDig.id = "digButton";
+    imgDig.src = "img/dig.png";
+    document.body.appendChild(imgDig);
+
     imgSoil.src = "img/soil.png";
     imgSoil2.src = "img/soil2.png";
     imgShovel1.src = "img/shovel1.png";
@@ -114,7 +120,6 @@ function setup()
     imgTakebera2.src = "img/takebera2.png";
     imgHeart1.src = "img/heart1.png";
     imgHeart2.src = "img/heart2.png";
-    imgDig.src = "img/dig.png";
     imgTitle.src = "img/title.png";
     imgBack.src = "img/back.png";
 
@@ -295,8 +300,6 @@ function draw()
         } else {
             ctx.drawImage(imgTakebera1, 0, 0, 16, 16, 84, 242, 48, 48);
         }
-
-        ctx.drawImage(imgDig, 0, 0, 16, 16, 84, 338, 48, 48);
         
         // 採掘範囲の線
         if (digTargetX >= 0 && digTargetX <= 8 && digTargetY >= 0 && digTargetY <= 8) {

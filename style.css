@@ -5,7 +5,6 @@
     transform: translateX(-50%);
     width: 120px;
     height: 120px;
-    padding: 0;
-    border: none;
-    background: none;
+    user-select: none;
+    -webkit-user-drag: none;
 }
