@@ -169,13 +169,15 @@ function setup()
                 doDigAction();
                 return;
             }
-
-            // 全画面表示ボタン
-            if (tapX == 10 && tapY == 0) {
-                changeFullScreen();
-            }
         }
     }, { passive: false });
+
+    document.getElementById("digButton").addEventListener("touchstart", function (e) {
+        e.preventDefault();
+        if (state === 1) {
+            doDigAction();
+        }
+    });
 
     canvas.addEventListener("touchmove", function (e) {
         updateTouchPos(e);
@@ -585,16 +587,5 @@ function doDigAction() {
         for (let x = 0; x < field[y].length; x++) {
             if (field[x][y] != 0) isGameClear = false;
         }
-    }
-}
-
-function changeFullScreen() {
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
     }
 }
