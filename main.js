@@ -454,8 +454,8 @@ function gameInit()
 function createButtons() {
     const buttons = [
         { id : "toolShovel", src : "img/shovel.png", tool : 1 },
-        { id : "toolSankakuho-", src : "img/sankakuho-", tool : 2 },
-        { id : "toolTakebera", src : "img/takebera", tool : 3 },
+        { id : "toolSankakuho-", src : "img/sankakuho-.png", tool : 2 },
+        { id : "toolTakebera", src : "img/takebera.png", tool : 3 },
         { id : "digButton", src : "img/dig.png", tool : "dig" }
     ];
 
