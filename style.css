@@ -6,8 +6,8 @@
 }
 
 .btn {
-    width: 360px;
-    height: 360px;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
