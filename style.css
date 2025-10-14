@@ -1,11 +1,11 @@
-.tool-buttons {
+.buttons {
     position: fixed;
     display: flex;
     gap: 10px;
     z-index: 9999;
 }
 
-.tool-btn {
+.btn {
     width: 360px;
     height: 360px;
     object-fit: contain;

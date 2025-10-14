@@ -467,7 +467,7 @@ function createButtons() {
         const img = document.createElement("img");
         img.id = btn.id;
         img.src = btn.src;
-        img.className = "buttons";
+        img.className = "btn";
 
         img.addEventListener("touchstart", function(e) {
             e.preventDefault();
