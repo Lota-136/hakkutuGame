@@ -44,7 +44,6 @@ let isGameClear;
 let isDamaged = false;  // この番ダメージを受けたか
 let isExcavated = false;    // この番土を掘ったか
 let particles = [];
-let toolAnimation = 0;
 let damageAnimation = 0;
 
 let field = [
@@ -105,10 +104,7 @@ function setup()
     document.body.appendChild(canvas);
 
     // ボタンの生成
-    const imgDig = document.createElement("img");
-    imgDig.id = "digButton";
-    imgDig.src = "img/dig.png";
-    document.body.appendChild(imgDig);
+    createButtons();
 
     imgSoil.src = "img/soil.png";
     imgSoil2.src = "img/soil2.png";
@@ -155,17 +151,14 @@ function setup()
             // ボタン類
             if (tapX == -2 && tapY == 0) {
                 tool = 1;
-                toolAnimation = 15;
                 return;
             }
             if (tapX == -2 && tapY == 2) {
                 tool = 2;
-                toolAnimation = 15;
                 return;
             }
             if (tapX == -2 && tapY == 4) {
                 tool = 3;
-                toolAnimation = 15;
                 return;
             }
             // 掘るボタン
@@ -226,7 +219,6 @@ function update()
         }
 
         // animationを規定値に → 0までの間アニメーションする
-        if (toolAnimation > 0) toolAnimation--;
         if (damageAnimation > 0) damageAnimation--;
 
         if (isGameClear) {
@@ -442,7 +434,6 @@ function gameInit()
     hp = 5;
     tool = 1;
     particles = [];
-    toolAnimation = 0;
     damageAnimation = 0;
 
     // 盤面リセット
@@ -465,6 +456,37 @@ function gameInit()
     item = Math.floor(Math.random() * itemName.length);
 
     isGameClear = false;
+}
+
+function createButtons() {
+    const buttons = [
+        { id : "toolShovel", src : "img/shovel.png", tool : 1 },
+        { id : "toolSankakuho-", src : "img/sankakuho-", tool : 2 },
+        { id : "toolTakebera", src : "img/takebera", tool : 3 },
+        { id : "digButton", src : "img/dig.png", tool : "dig" }
+    ];
+
+    const container = document.createElement("div");
+    container.className = "buttons";
+    document.body.appendChild(container);
+
+    buttons.forEach(btn => {
+        const img = document.createElement("img");
+        img.id = btn.id;
+        img.src = btn.src;
+        img.className = "buttons";
+
+        img.addEventListener("touchstart", function(e) {
+            e.preventDefault();
+            if (btn.tool === "dig") {
+                if (state === 1) doDigAction();
+            } else {
+                tool = btn.tool;
+            }
+        });
+
+        container.appendChild(img);
+    });
 }
 
 function excavate(field, x, y) {
