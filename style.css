@@ -16,7 +16,7 @@
 }
 
 @media (orientation: portrait) {
-    .tool-buttons {
+    .buttons {
         bottom: 15px;
         left: 50%;
         transform: translateX(-50%);
@@ -25,7 +25,7 @@
 }
 
 @media (orientation: landscape) {
-    .tool-buttons {
+    .buttons {
         top: 50%;
         right: 15px;
         transform: translateY(-50%);
