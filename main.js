@@ -170,13 +170,6 @@ function setup()
         }
     }, { passive: false });
 
-    document.getElementById("digButton").addEventListener("touchstart", function (e) {
-        e.preventDefault();
-        if (state === 1) {
-            doDigAction();
-        }
-    });
-
     canvas.addEventListener("touchmove", function (e) {
         updateTouchPos(e);
 
