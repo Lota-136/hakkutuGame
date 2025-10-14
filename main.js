@@ -108,11 +108,11 @@ function setup()
 
     imgSoil.src = "img/soil.png";
     imgSoil2.src = "img/soil2.png";
-    imgShovel1.src = "img/shovel1.png";
+    imgShovel1.src = "img/shovel.png";
     imgShovel2.src = "img/shovel2.png";
-    imgSankakuho1.src = "img/sankakuho-1.png";
+    imgSankakuho1.src = "img/sankakuho-.png";
     imgSankakuho2.src = "img/sankakuho-2.png";
-    imgTakebera1.src = "img/takebera1.png";
+    imgTakebera1.src = "img/takebera.png";
     imgTakebera2.src = "img/takebera2.png";
     imgHeart1.src = "img/heart1.png";
     imgHeart2.src = "img/heart2.png";
