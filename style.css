@@ -11,7 +11,7 @@
     gap: 10px;
 }
 
-.btn {
+/* .btn {
     width: 80px;
     height: 80px;
     object-fit: contain;
@@ -19,30 +19,6 @@
     image-rendering: crisp-edges;
     user-select: none;
     -webkit-user-drag: none;
-}
-
-/* @media (orientation: portrait) {
-    .buttons {
-        bottom: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-        flex-direction: row;
-    }
-}
-
-@media (orientation: landscape) {
-    .buttons {
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        flex-direction: column;
-    }
-}
-
-@media (orientation: landscape) {
-    body {
-        background-color: red !important;
-    }
 } */
 
 @media (orientation: portrait) {
