@@ -91,13 +91,13 @@ function setup()
 {
     // canvasの生成
     canvas = document.createElement(`canvas`);
-    canvas.width = SCREEN_WIDTH * scaleRate;
-    canvas.height = SCREEN_HEIGHT * scaleRate;
+    canvas.width = SCREEN_WIDTH;
+    canvas.height = SCREEN_HEIGHT;
 
     scaleRate = Math.min((window.innerWidth - 15) / SCREEN_WIDTH, (window.innerHeight - 15) / SCREEN_HEIGHT);
     canvas.style.backgroundColor = `white`;
     canvas.style.border = `2px solid`;
-    canvas.style.width = "auto";
+    canvas.style.maxWidth = SCREEN_WIDTH + "px";
     canvas.style.height = "auto";
 
     ctx = canvas.getContext(`2d`);
