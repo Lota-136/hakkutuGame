@@ -6,12 +6,7 @@
     align-items: flex-start;
 }
 
-.buttons {
-    display: flex;
-    gap: 10px;
-}
-
-/* .btn {
+.btn {
     width: 80px;
     height: 80px;
     object-fit: contain;
@@ -19,7 +14,14 @@
     image-rendering: crisp-edges;
     user-select: none;
     -webkit-user-drag: none;
-} */
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    position: static;
+    z-index: auto;
+}
 
 @media (orientation: portrait) {
     #game-container {
