@@ -1,8 +1,14 @@
+#game-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: flex-start;
+}
+
 .buttons {
-    position: fixed;
     display: flex;
     gap: 10px;
-    z-index: 9999;
 }
 
 .btn {
@@ -15,7 +21,7 @@
     -webkit-user-drag: none;
 }
 
-@media (orientation: portrait) {
+/* @media (orientation: portrait) {
     .buttons {
         bottom: 15px;
         left: 50%;
@@ -36,5 +42,25 @@
 @media (orientation: landscape) {
     body {
         background-color: red !important;
+    }
+} */
+
+@media (orientation: portrait) {
+    #game-container {
+        flex-direction: column;
+    }
+    .buttons {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+
+@media (orientation: landscape) {
+    #game-container {
+        flex-direction: row;
+    }
+    .buttons {
+        flex-direction: column;
+        justify-content: flex-start;
     }
 }

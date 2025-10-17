@@ -101,6 +101,7 @@ function setup()
     canvas.style.height = SCREEN_HEIGHT * scaleRate + `px`;
 
     ctx = canvas.getContext(`2d`);
+    const container = document.getElementById("game-container");
     document.body.appendChild(canvas);
 
     // ボタンの生成
@@ -461,7 +462,7 @@ function createButtons() {
 
     const container = document.createElement("div");
     container.className = "buttons";
-    document.body.appendChild(container);
+    document.getElementById("game-container").appendChild(container);
 
     buttons.forEach(btn => {
         const img = document.createElement("img");
