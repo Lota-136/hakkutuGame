@@ -102,7 +102,7 @@ function setup()
 
     ctx = canvas.getContext(`2d`);
     const container = document.getElementById("game-container");
-    document.body.appendChild(canvas);
+    container.appendChild(canvas);
 
     // ボタンの生成
     createButtons();
