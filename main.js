@@ -91,14 +91,14 @@ function setup()
 {
     // canvasの生成
     canvas = document.createElement(`canvas`);
-    canvas.width = SCREEN_WIDTH;
-    canvas.height = SCREEN_HEIGHT;
+    canvas.width = SCREEN_WIDTH * scaleRate;
+    canvas.height = SCREEN_HEIGHT * scaleRate;
 
     scaleRate = Math.min((window.innerWidth - 15) / SCREEN_WIDTH, (window.innerHeight - 15) / SCREEN_HEIGHT);
     canvas.style.backgroundColor = `white`;
     canvas.style.border = `2px solid`;
-    canvas.style.width = SCREEN_WIDTH * scaleRate + `px`;
-    canvas.style.height = SCREEN_HEIGHT * scaleRate + `px`;
+    canvas.style.width = "auto";
+    canvas.style.height = "auto";
 
     ctx = canvas.getContext(`2d`);
     const container = document.getElementById("game-container");
@@ -468,7 +468,7 @@ function createButtons() {
         const img = document.createElement("img");
         img.id = btn.id;
         img.src = btn.src;
-        img.className = "tool-btn";
+        img.className = "btn";
 
         img.addEventListener("touchstart", function(e) {
             e.preventDefault();
