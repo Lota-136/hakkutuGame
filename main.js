@@ -99,9 +99,6 @@ function setup()
     canvas.width = SCREEN_WIDTH * scaleRate + `px`;
     canvas.height = SCREEN_HEIGHT * scaleRate + `px`;
 
-    canvas.style.width = "100%";
-    canvas.style.height ="auto";
-
     ctx = canvas.getContext(`2d`);
     const container = document.getElementById("game-container");
     container.appendChild(canvas);
