@@ -91,13 +91,14 @@ function setup()
 {
     // canvasの生成
     canvas = document.createElement(`canvas`);
+    canvas.width = SCREEN_WIDTH;
+    canvas.height = SCREEN_HEIGHT;
 
     scaleRate = Math.min((window.innerWidth - 15) / SCREEN_WIDTH, (window.innerHeight - 15) / SCREEN_HEIGHT);
     canvas.style.backgroundColor = `white`;
     canvas.style.border = `2px solid`;
-
-    canvas.width = SCREEN_WIDTH * scaleRate + `px`;
-    canvas.height = SCREEN_HEIGHT * scaleRate + `px`;
+    canvas.style.width = SCREEN_WIDTH * scaleRate + `px`;
+    canvas.style.height = SCREEN_HEIGHT * scaleRate + `px`;
 
     ctx = canvas.getContext(`2d`);
     const container = document.getElementById("game-container");
