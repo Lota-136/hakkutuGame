@@ -31,7 +31,7 @@ const SCREEN_HEIGHT = 432;
 let mouse = {};
 
 let state = 0;
-let debug = true;
+let debug = false;
 
 let posX;
 let posY;
