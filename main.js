@@ -2,31 +2,31 @@
 
 // 文字数制限：25字
 const itemName = [
-    "馬型埴輪（うまがたはにわ）", 
-    "家型埴輪（いえがたはにわ）",
-    "琴を弾く人物埴輪（ことをひくじんぶつはにわ）",
-    "小馬型埴輪（こうまがたはにわ）",
-    "翡翠製獣型勾玉（ひすいせいじゅうけいまがたま）",
-    "青磁袴腰香炉（せいじはかまごしこうろ）"
+    ["馬型埴輪", "うまがたはにわ"], 
+    ["家型埴輪", "いえがたはにわ"],
+    ["琴を弾く人物埴輪", "ことをひくじんぶつはにわ"],
+    ["小馬型埴輪", "こうまがたはにわ"],
+    ["翡翠製獣型勾玉", "ひすいせいじゅうけいまがたま"],
+    ["青磁袴腰香炉", "せいじはかまごしこうろ"]
 ];
 
 // 文字数制限：130字程度
 // 25文字区切り、文脈をスペースで調整
 const explain = [
-    "馬を表したはにわです。現代の馬と比べて足が短く、　体には乗馬する時に必要なさまざまな道具がつけられています。",
-    "高床式（たかゆかしき）の建物を表現したはにわです。屋根には鰹木（かつおぎ）という、その家に住んでいた人の地位の高さを表すものがついています。",
-    "イスにすわり、５本の弦がある琴（こと）をヒザに　　のせた人物のはにわです。はにわのカケラが発掘されたあと、それをもとに復元されました。",
-    "小馬のはにわです。他の馬のはにわにある鞍（くら）やたてがみがなく、発見されたときは「子犬型埴輪」　　として紹介されていました。",
-    "横から見た動物のように見えることから獣型勾玉と　　呼ばれており、弥生（やよい）時代前期のものと　　　考えられています。",
-    "田原城主の菩提寺（ぼだいじ、先祖のお墓がある寺）　である千光寺（せんこうじ）跡の墓地から発見された　香炉です。"
+    "馬を表したはにわです。現代の馬と比べて足が短く、体には乗馬　する時に必要なさまざまな道具がつけられています。",
+    "高床式（たかゆかしき）の建物を表現したはにわです。屋根には　鰹木（かつおぎ）という、その　家に住んでいた人の地位の高さを表すものがついています。",
+    "イスにすわり、５本の弦がある　琴（こと）をヒザにのせた人物のはにわです。はにわのカケラが　発掘されたあと、それをもとに　復元されました。",
+    "小馬のはにわです。他の馬の　　はにわにある鞍（くら）や　　　たてがみがなく、発見されたときは「子犬型埴輪」として紹介　　されていました。",
+    "横から見た動物のように見える　ことから獣型勾玉と呼ばれており弥生（やよい）時代前期のものと考えられています。",
+    "田原城主の菩提寺（ぼだいじ）、先祖のお墓がある寺である　　　千光寺（せんこうじ）跡の墓地　から発見された香炉です。"
 ];
 
 let canvas;
 let ctx;
 let scaleRate;
 
-const SCREEN_WIDTH = 800;
-const SCREEN_HEIGHT = 560;
+const SCREEN_WIDTH = 432;
+const SCREEN_HEIGHT = 432;
 
 let mouse = {};
 
@@ -45,6 +45,7 @@ let isDamaged = false;  // この番ダメージを受けたか
 let isExcavated = false;    // この番土を掘ったか
 let particles = [];
 let damageAnimation = 0;
+let tutorialPage = 0;
 
 let field = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -70,6 +71,8 @@ const imgHeart1 = new Image();
 const imgHeart2 = new Image();
 const imgTitle = new Image();
 const imgBack = new Image();
+const imgDig = new Image();
+const imgHand = new Image();
 
 const sndExcavate = new Audio();
 const sndMiss = new Audio();
@@ -90,17 +93,26 @@ window.onload = setup;
 function setup()
 {
     // canvasの生成
-    canvas = document.createElement(`canvas`);
-    canvas.width = SCREEN_WIDTH;
-    canvas.height = SCREEN_HEIGHT;
+    canvas = document.createElement("canvas");
 
-    scaleRate = Math.min((window.innerWidth - 15) / SCREEN_WIDTH, (window.innerHeight - 15) / SCREEN_HEIGHT);
-    canvas.style.backgroundColor = `white`;
-    canvas.style.border = `2px solid`;
-    canvas.style.maxWidth = SCREEN_WIDTH + "px";
+    let rawScale = Math.min((window.innerWidth - 15) / SCREEN_WIDTH,
+                            (window.innerHeight - 15) / SCREEN_HEIGHT);
+
+    if (!isFinite(rawScale) || rawScale <= 0) {
+        rawScale = 1;
+    }
+    scaleRate = rawScale;
+
+    canvas.width = SCREEN_WIDTH * scaleRate;
+    canvas.height = SCREEN_HEIGHT * scaleRate;
+
+    canvas.style.backgroundColor = "white";
+    canvas.style.border = "2px solid";
+    canvas.style.width = "auto";
     canvas.style.height = "auto";
 
-    ctx = canvas.getContext(`2d`);
+    ctx = canvas.getContext("2d");
+
     const container = document.getElementById("game-container");
     container.appendChild(canvas);
 
@@ -119,6 +131,8 @@ function setup()
     imgHeart2.src = "img/heart2.png";
     imgTitle.src = "img/title.png";
     imgBack.src = "img/back.png";
+    imgDig.src = "img/dig.png";
+    imgHand.src = "img/hand.png";
 
     imgEx = imgExPaths.map(path => {
         const img = new Image();
@@ -130,17 +144,39 @@ function setup()
     sndMiss.src = "sound/miss.mp3";
     sndJingle.src = "sound/jingle.mp3";
 
+    if (debug) {
+        document.addEventListener("keyup", function (event) {
+            let key = event.key;
+            if (key == "q") {
+                field = [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                ];
+            }
+        })
+    }
+
     canvas.addEventListener("touchstart", function(e) {
         updateTouchPos(e);
 
-        const tapX = Math.floor((mouse.x - 184) / 48);
-        const tapY = Math.floor((mouse.y - 53) / 48);
+        const tapX = Math.floor(mouse.x / 48);
+        const tapY = Math.floor(mouse.y / 48);
 
         if (state === 0) {
-            playSound(sndJingle);
-            state = 1;
-            gameInit();
-            return;
+            if (mouse.x > 33 && mouse.x < 183 && mouse.y > 320 && mouse.y < 370) {
+                gameInit();
+                state = 1;
+            }
+            if (mouse.x > 249 && mouse.x < 399 && mouse.y > 320 && mouse.y < 370) {
+                state = 4;
+            }
         }
 
         if (state === 1) {
@@ -148,25 +184,23 @@ function setup()
                 digTargetX = tapX;
                 digTargetY = tapY;
             }
+        }
 
-            // ボタン類
-            if (tapX == -2 && tapY == 0) {
-                tool = 1;
-                return;
+        if (state === 2 || state === 3) {
+            if (mouse.x > 33 && mouse.x < 183 && mouse.y > 320 && mouse.y < 370) {
+                gameInit();
+                state = 1;
             }
-            if (tapX == -2 && tapY == 2) {
-                tool = 2;
-                return;
+            if (mouse.x > 249 && mouse.x < 399 && mouse.y > 320 && mouse.y < 370) {
+                state = 0;
             }
-            if (tapX == -2 && tapY == 4) {
-                tool = 3;
-                return;
-            }
-            // 掘るボタン
-            if (tapX == -2 && tapY == 6) {
-                e.preventDefault();
-                doDigAction();
-                return;
+        }
+
+        if (state === 4) {
+            tutorialPage++;
+            if (tutorialPage >= 6) {
+                tutorialPage = 0;
+                state = 0;
             }
         }
     }, { passive: false });
@@ -175,8 +209,8 @@ function setup()
         updateTouchPos(e);
 
         if (state === 1) {
-            const tapX = Math.floor((mouse.x - 184) / 48);
-            const tapY = Math.floor((mouse.y - 53) / 48);
+            const tapX = Math.floor(mouse.x / 48);
+            const tapY = Math.floor(mouse.y / 48);
 
             // 盤面の範囲内なら更新する
             if (tapX >= 0 && tapX <= 8 && tapY >= 0 && tapY <= 8) {
@@ -189,8 +223,10 @@ function setup()
     function updateTouchPos(e) {
         e.preventDefault(); // スクロール防止
         const t = e.touches[0];
-        mouse.x = t.clientX / scaleRate;
-        mouse.y = t.clientY / scaleRate;
+        const rect = canvas.getBoundingClientRect();
+
+        mouse.x = (t.clientX - rect.left) / scaleRate;
+        mouse.y = (t.clientY- rect.top) / scaleRate;
     }
 
     update();
@@ -226,11 +262,13 @@ function update()
 
 function draw()
 {
+    ctx.save();
+    ctx.setTransform(scaleRate, 0, 0, scaleRate, 0, 0);
     ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     ctx.imageSmoothingEnabled = false;      // ドット絵のボケ防止処理
 
-    ctx.drawImage(imgBack, 0, 0, 100, 70, 0, 0, 800, 560);
+    ctx.drawImage(imgBack, 20, 5, 100, 70, 0, 0, 700, 490);
     ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
     ctx.fillRect(0, 0, 800, 560);
 
@@ -239,115 +277,65 @@ function draw()
     ctx.textAlign = "center";
     if (state == 0) {
         // タイトル
-        ctx.drawImage(imgTitle, 0, 0, 180, 100, 130, 50, 540, 300);
+        ctx.drawImage(imgTitle, 0, 0, 180, 100, 36, 50, 360, 200);
+        
+        // ゲームスタート
+        ctx.fillStyle = "#7cf";
+        ctx.fillRect(SCREEN_WIDTH / 4 - 150 / 2, 320, 150, 50);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#fff";
+        ctx.strokeRect(SCREEN_WIDTH / 4 - 150 / 2 + 5, 320 + 5, 140, 40);
+
         ctx.fillStyle = "#000";
-        ctx.fillText("クリックしてゲームをスタート", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4 * 3);
+        ctx.font = "15px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("ゲームスタート", SCREEN_WIDTH / 4, 350);
+
+        // 説明
+        ctx.fillStyle = "#7cf ";
+        ctx.fillRect(SCREEN_WIDTH / 4 * 3 - 150 / 2, 320, 150, 50);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#fff";
+        ctx.strokeRect(SCREEN_WIDTH / 4 * 3 - 150 / 2 + 5, 320 + 5, 140, 40);
+
+        ctx.fillStyle = "#000";
+        ctx.font = "15px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("ルールせつめい", SCREEN_WIDTH / 4 * 3, 350);
     }
 
     if (state == 1) {
         // 出土品画像
         if (imgEx[item].complete) {
-            ctx.drawImage(imgEx[item], 0, 0, 48, 48, 180, 50, 432, 432);
+            ctx.drawImage(imgEx[item], 0, 0, 48, 48, 0, 0, 432, 432);
         }
         // ゲーム画面
         for (let y = 0; y < field.length; y++) {
             for (let x = 0; x < field[y].length; x++){
                 if (field[x][y] == 1) {
-                    ctx.drawImage(imgSoil2, 0, 0, 16, 16, x * 48 + 180, y * 48 + 50, 48, 48);
+                    ctx.drawImage(imgSoil2, 0, 0, 16, 16, x * 48, y * 48, 48, 48);
                 } else if (field[x][y] == 2) {
-                    ctx.drawImage(imgSoil, 0, 0, 16, 16, x * 48 + 180, y * 48 + 50, 48, 48);
+                    ctx.drawImage(imgSoil, 0, 0, 16, 16, x * 48, y * 48, 48, 48);
                 }
             }
-        }
-
-        // 盤面の枠
-        ctx.lineWidth = 5;
-        if (damageAnimation > 0) {
-            const alpha = damageAnimation / 15;
-            ctx.strokeStyle =`rgba(255, 50, 50, ${alpha})`;
-        } else {
-            ctx.strokeStyle = "#c90";
-        }
-        ctx.strokeRect(180, 50, 432, 432);
-
-        // 道具アイコン
-        if (tool == 1) {
-            ctx.drawImage(imgShovel2, 0, 0, 16, 16, 84, 50, 48, 48);
-        } else {
-            ctx.drawImage(imgShovel1, 0, 0, 16, 16, 84, 50, 48, 48);
-        }
-        if (tool == 2) {
-            ctx.drawImage(imgSankakuho2, 0, 0, 16, 16, 84, 146, 48, 48);
-        } else {
-            ctx.drawImage(imgSankakuho1, 0, 0, 16, 16, 84, 146, 48, 48);
-        }
-        if (tool == 3) {
-            ctx.drawImage(imgTakebera2, 0, 0, 16, 16, 84, 242, 48, 48);
-        } else {
-            ctx.drawImage(imgTakebera1, 0, 0, 16, 16, 84, 242, 48, 48);
         }
         
         // 採掘範囲の線
         if (digTargetX >= 0 && digTargetX <= 8 && digTargetY >= 0 && digTargetY <= 8) {
+            ctx.lineWidth = 5;
             ctx.strokeStyle = "#fb3";
 
             switch (tool) {
                 case 1:
-                    ctx.strokeRect((digTargetX - 1) * 48 + 180, (digTargetY - 1) * 48 + 50, 144, 144);
+                    ctx.strokeRect((digTargetX - 1) * 48, (digTargetY - 1) * 48, 144, 144);
                     break;
                 case 2:
-                    ctx.strokeRect(digTargetX * 48 + 180, (digTargetY - 1) * 48 + 50, 48, 144);
+                    ctx.strokeRect(digTargetX * 48, (digTargetY - 1) * 48, 48, 144);
                     break;
                 case 3:
-                    ctx.strokeRect(digTargetX * 48 + 180, digTargetY * 48 + 50, 48, 48);
+                    ctx.strokeRect(digTargetX * 48, digTargetY * 48, 48, 48);
                     break;
             }
-        }
-
-        // 採掘範囲のアニメーション表示（スマホ操作では非表示）
-        // if (toolAnimation > 0) {
-        //     const alpha = toolAnimation / 15;
-        //     ctx.strokeStyle = `rgba(255, 187, 51, ${alpha})`;
-        //     ctx.lineWidth = 4;
-
-        //     switch (tool) {
-        //         case 1:
-        //             ctx.strokeRect((digTargetX - 1) * 48 + 180, (digTargetY - 1) * 48 + 50, 144, 144);
-        //             break;
-        //         case 2:
-        //             ctx.strokeRect(digTargetX * 48 + 180, (digTargetY - 1) * 48 + 50, 48, 144);
-        //             break;
-        //         case 3:
-        //             ctx.strokeRect(digTargetX * 48 + 180, digTargetY * 48 + 50, 48, 48);
-        //             break;
-        //     }
-        // }
-
-        // hp
-        if (hp >= 5) {
-            ctx.drawImage(imgHeart1, 0, 0, 10, 10, 330, 500, 30, 30);
-        } else {
-            ctx.drawImage(imgHeart2, 0, 0, 10, 10, 330, 500, 30, 30);
-        }
-        if (hp >= 4) {
-            ctx.drawImage(imgHeart1, 0, 0, 10, 10, 290, 500, 30, 30);
-        } else {
-            ctx.drawImage(imgHeart2, 0, 0, 10, 10, 290, 500, 30, 30);
-        }
-        if (hp >= 3) {
-            ctx.drawImage(imgHeart1, 0, 0, 10, 10, 250, 500, 30, 30);
-        } else {
-            ctx.drawImage(imgHeart2, 0, 0, 10, 10, 250, 500, 30, 30);
-        }
-        if (hp >= 2) {
-            ctx.drawImage(imgHeart1, 0, 0, 10, 10, 210, 500, 30, 30);
-        } else {
-            ctx.drawImage(imgHeart2, 0, 0, 10, 10, 210, 500, 30, 30);
-        }
-        if (hp >= 1) {
-            ctx.drawImage(imgHeart1, 0, 0, 10, 10, 170, 500, 30, 30);
-        } else {
-            ctx.drawImage(imgHeart2, 0, 0, 10, 10, 170, 500, 30, 30);
         }
 
         // パーティクルの描画
@@ -364,52 +352,132 @@ function draw()
     
     if (state == 2 || state == 3) {
         // 背景
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(100, 100, 600, 360);
-        ctx.strokeStyle = "#09a";
-        ctx.strokeRect(100, 100, 600, 360);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.fillRect(20, 20, SCREEN_WIDTH - 40, SCREEN_HEIGHT - 40);
 
         // もう一度遊ぶ
-        ctx.strokeStyle = "#09a";
-        ctx.strokeRect(150, 350, 200, 70);
+        ctx.fillStyle = "#7cf";
+        ctx.fillRect(SCREEN_WIDTH / 4 - 150 / 2, 320, 150, 50);
 
         ctx.fillStyle = "#000";
-        ctx.font = "bold 23px sans-serif";
+        ctx.font = "15px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("もう一度遊ぶ", 250, 390);
+        ctx.fillText("もう１回あそぶ", SCREEN_WIDTH / 4, 350);
 
         // タイトルに戻る
-        ctx.strokeStyle = "#09a";
-        ctx.strokeRect(450, 350, 200, 70);
+        ctx.fillStyle = "#7cf ";
+        ctx.fillRect(SCREEN_WIDTH / 4 * 3 - 150 / 2, 320, 150, 50);
 
         ctx.fillStyle = "#000";
-        ctx.font = "bold 23px sans-serif";
+        ctx.font = "15px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("タイトルに戻る", 550, 390);
+        ctx.fillText("タイトルにもどる", SCREEN_WIDTH / 4 * 3, 350);
     }
     
     if (state == 2) {
         // 出土品の名前
         ctx.fillStyle = "#000";
-        ctx.font = "bold 23px sans-serif";
+        ctx.font = "bold 20px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(itemName[item], 400, 150);
+        ctx.fillText(itemName[item][0], SCREEN_WIDTH / 2, 60);
+
+        // ふりがな
+        ctx.font = "12px sans-serif";
+        ctx.fillText(itemName[item][1], SCREEN_WIDTH / 2, 40);
 
         // 出土品の説明
-        ctx.font = "16px sans-serif";
+        ctx.font = "14px sans-serif";
         ctx.textAlign = "left";
-        fillTextLine(explain[item], 280, 200);
+        fillTextLine(explain[item], 194, 100, 15);
 
         // 出土品の画像
-        ctx.drawImage(imgEx[item], 0, 0, 48, 48, 120, 170, 144, 144);
+        ctx.drawImage(imgEx[item], 0, 0, 48, 48, 40, 80, 144, 144);
     }
     
     if (state == 3) {
         // ゲームオーバー
         ctx.fillStyle = "#000";
-        ctx.font = "bold 23px sans-serif";
+        ctx.font = "bold 20px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("ゲームオーバー", 400, 150);
+        ctx.fillText("ゲームオーバー", SCREEN_WIDTH / 2, 60);
+    }
+
+    if (state === 4) {
+        // 背景
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.fillRect(20, 20, SCREEN_WIDTH - 40, SCREEN_HEIGHT - 40);
+
+        ctx.fillStyle = "#000";
+        ctx.font = "bold 20px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("ルールせつめい", SCREEN_WIDTH / 2, 60);
+
+        if (tutorialPage === 1) {
+            // 本文
+            ctx.font = "16px sans-serif";
+            ctx.textAlign = "left";
+            fillTextLine("スワイプでほる場所をきめます", 35, 350, 22);
+        } else if (tutorialPage === 2) {
+            // 本文
+            ctx.font = "16px sans-serif";
+            ctx.textAlign = "left";
+            fillTextLine("きめたらこのボタンで土をほりましょう", 35, 350, 22);
+
+            // ボタン
+            ctx.drawImage(imgDig, 0, 0, 16, 16, SCREEN_WIDTH / 2 - 32, 180, 64, 64);
+        } else if (tutorialPage === 3) {
+            // 本文
+            ctx.font = "16px sans-serif";
+            ctx.textAlign = "left";
+            fillTextLine("道具は３つあって、それぞれはんいがきまって　います", 35, 350, 22);
+
+            // 土
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40, 80, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40, 80 + 32, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40, 80 + 64, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40 + 32, 80, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40 + 32, 80 + 32, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40 + 32, 80 + 64, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40 + 64, 80, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40 + 64, 80 + 32, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 40 + 64, 80 + 64, 32, 32);
+
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 220, 80, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 220, 80 + 32, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 220, 80 + 64, 32, 32);
+
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 330, 80 + 32, 32, 32);
+
+            // ボタン
+            ctx.drawImage(imgShovel1, 0, 0, 16, 16, 40 + 32, 200, 32, 32);
+            ctx.drawImage(imgSankakuho1, 0, 0, 16, 16, 220, 200, 32, 32);
+            ctx.drawImage(imgTakebera1, 0, 0, 16, 16, 330, 200, 32, 32);
+        } else if (tutorialPage === 4) {
+            // 本文
+            ctx.font = "16px sans-serif";
+            ctx.textAlign = "left";
+            fillTextLine("色がこい土は２回ほりましょう", 35, 350, 22);
+
+            // 土
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 300, 100, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 300 + 32, 100, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 300, 100 + 32, 32, 32);
+            ctx.drawImage(imgSoil2, 0, 0, 16, 16, 300 + 32, 100 + 32, 32, 32);
+
+            ctx.drawImage(imgSoil, 0, 0, 16, 16, 50, 100, 32, 32);
+            ctx.drawImage(imgSoil, 0, 0, 16, 16, 50 + 32, 100, 32, 32);
+            ctx.drawImage(imgSoil, 0, 0, 16, 16, 50, 100 + 32, 32, 32);
+            ctx.drawImage(imgSoil, 0, 0, 16, 16, 50 + 32, 100 + 32, 32, 32);
+
+            // 指
+            ctx.drawImage(imgHand, 0, 0, 16, 16, 310, 145, 32, 32);
+            ctx.drawImage(imgHand, 0, 0, 16, 16, 60, 145, 32, 32);
+        } else if (tutorialPage === 5) {
+            // 本文
+            ctx.font = "16px sans-serif";
+            ctx.textAlign = "left";
+            fillTextLine("すべての土をほって、四條畷（しじょうなわて）の文化財（ぶんかざい）をはっくつしよう！", 35, 350, 22);
+        } 
     }
 
     // デバッグ表示
@@ -418,9 +486,12 @@ function draw()
     if (debug) {
         ctx.fillText("digTargetX = " + Math.floor(digTargetX), 0, 10);
         ctx.fillText("digTargetY = " + Math.floor(digTargetY), 0, 30);
-        ctx.fillText("item =  " + item, 0, 50);
+        ctx.fillText("item = " + item, 0, 50);
         ctx.fillText("state = " + state, 0, 70);
+        ctx.fillText("tutorialPage = " + tutorialPage, 0, 90);
     }
+
+    ctx.restore();
 }
 
 function gameInit()
@@ -506,13 +577,12 @@ function excavate(field, x, y) {
 //     ctx.stroke();
 // }
 
-function fillTextLine(text, x, y)
-{
+function fillTextLine(text, x, y, charNum) {
     let textLine = [];
 
-    // textを25文字ごとに分け、textLineに追加
-    for (let i = 0; i < text.length; i += 25) {
-        textLine.push(text.slice(i, i + 25));
+    // textを指定文字ごとに分け、textLineに追加
+    for (let i = 0; i < text.length; i += charNum) {
+        textLine.push(text.slice(i, i + charNum));
     }
 
     // 配列を取り出して表示
@@ -534,8 +604,8 @@ function createParticles(x, y, img) {
     ]
     for (let p of pieces) {
         particles.push({
-            x: x * 48 + 180 + 18,
-            y: y * 48 + 50 + 18,
+            x: x * 48 + 18,
+            y: y * 48 + 18,
             vx: p.vx,
             vy: p.vy,
             life: 15,

@@ -1,10 +1,18 @@
-
 #game-container {
     display: flex;
     width: 100vw;
     height: 100vh;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    overflow: hidden;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 .btn {
@@ -20,8 +28,6 @@
 .buttons {
     display: flex;
     gap: 10px;
-    position: static;
-    z-index: auto;
 }
 
 @media (orientation: portrait) {
@@ -40,6 +46,8 @@
     }
     .buttons {
         flex-direction: column;
-        justify-content: flex-start;
+        justify-content: center;
+        align-items: flex-start;
+        margin-left: 20px;
     }
 }
